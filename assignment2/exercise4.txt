@@ -1,0 +1,5 @@
+I don't know what else to explain here. 
+Variable names are included before their memory addresses and corresponding hex/decimal values. That has been done for easier readability.
+
+Char x is before short i, the rest follow accordingly.
+

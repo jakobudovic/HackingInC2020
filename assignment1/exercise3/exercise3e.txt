@@ -1,0 +1,9 @@
+I could easiy run script 10 times by hand and append the output to the txt file but I wanted to find out an easier option, that I could use for example for higher number of script runs (100+).
+
+So, after some googling, I used bash command:
+
+for i in `seq 10`; do ./exercise3d | wc -l >> exercise3d.txt; done
+
+Which executed my script ./exercise3d 10 times, counted the number of lines with the command "wc -l". I used pipeline here | to redirect the standard output to wc program.
+After the number of lines were counted, I appended the output to the exercise3d.txt as instructed.
+

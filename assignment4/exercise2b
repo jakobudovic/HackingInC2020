@@ -1,0 +1,31 @@
+2.
+b)
+
+I chose my input to be "my_password" here. It is 11 bytes long and the rest is just null bytes, 8 of them to be exact.
+
+Then we compare it to a secret password with puts method.
+If the password is wrong (which it obviously is), it writes "Wrong password".
+
+After some testing I decided to input too long password string and overrite the "ok" variable stored above it on the stack (as well as the i variable from before).
+
+After inputing 123456789123456789123456789 i got this:
+(gdb) info locals
+buf = "12345678912345678912"
+ok = 892613426
+i = 825833527
+
+I don't know where the rest of my string "3456789" wend and how, but ok is now different value as 0 and as we've learned in one of the previous assignments,
+0 means false and
+anything else means true.
+
+After comparing/checking overridden variable "ok" I gained the root access.
+
+(gdb) info locals
+buf = "12345678912345678912"
+ok = 892613426
+i = 825833527
+(gdb) n
+You're root!
+37	in main.c
+
+The solution for the program not to crash is just to not input too long pasword.

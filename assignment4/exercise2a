@@ -1,0 +1,82 @@
+2.
+a)
+
+start
+break <breakpoint>
+delete (deletes all breakpoints)
+continue (goes to the first breakpoint)
+info locals
+disass
+n (next)
+s (step)
+p <var>
+p &<var>
+watch <var> (tells you the value of the var anytime it changes)
+rwatch <var> (tells you the value of the var anytime we read it)
+   
+
+(gdb) disass
+Dump of assembler code for function main:
+   0x0000000000401c46 <+0>:	push   %rbp
+   0x0000000000401c47 <+1>:	mov    %rsp,%rbp
+   0x0000000000401c4a <+4>:	sub    $0x20,%rsp
+   0x0000000000401c4e <+8>:	movl   $0x0,-0x4(%rbp)
+   0x0000000000401c55 <+15>:	movl   $0x0,-0x8(%rbp)
+   0x0000000000401c5c <+22>:	jmp    0x401c6c <main+38>
+   0x0000000000401c5e <+24>:	mov    -0x8(%rbp),%eax
+   0x0000000000401c61 <+27>:	cltq   
+   0x0000000000401c63 <+29>:	movb   $0x0,-0x20(%rbp,%rax,1)
+   0x0000000000401c68 <+34>:	addl   $0x1,-0x8(%rbp)
+   0x0000000000401c6c <+38>:	cmpl   $0x13,-0x8(%rbp)
+   0x0000000000401c70 <+42>:	jle    0x401c5e <main+24>
+   0x0000000000401c72 <+44>:	lea    0x803c7(%rip),%rdi        # 0x482040
+   0x0000000000401c79 <+51>:	mov    $0x0,%eax
+   0x0000000000401c7e <+56>:	callq  0x40c880 <printf>
+   0x0000000000401c83 <+61>:	lea    -0x20(%rbp),%rax
+   0x0000000000401c87 <+65>:	mov    %rax,%rdi
+   0x0000000000401c8a <+68>:	mov    $0x0,%eax
+   0x0000000000401c8f <+73>:	callq  0x40d380 <gets>
+=> 0x0000000000401c94 <+78>:	lea    -0x20(%rbp),%rax
+   0x0000000000401c98 <+82>:	mov    $0x14,%edx
+   0x0000000000401c9d <+87>:	mov    %rax,%rsi
+   0x0000000000401ca0 <+90>:	lea    0xaa659(%rip),%rdi        # 0x4ac300 <hash>
+   0x0000000000401ca7 <+97>:	callq  0x40573a <sha256>
+   0x0000000000401cac <+102>:	lea    0x8036d(%rip),%rsi        # 0x482020 <okhash>
+   0x0000000000401cb3 <+109>:	lea    0xaa646(%rip),%rdi        # 0x4ac300 <hash>
+   0x0000000000401cba <+116>:	callq  0x401bf5 <hash_equals>
+   0x0000000000401cbf <+121>:	test   %eax,%eax
+   0x0000000000401cc1 <+123>:	je     0x401cca <main+132>
+   0x0000000000401cc3 <+125>:	movl   $0x1,-0x4(%rbp)
+   0x0000000000401cca <+132>:	cmpl   $0x0,-0x4(%rbp)
+   0x0000000000401cce <+136>:	je     0x401cde <main+152>
+---Type <return> to continue, or q <return> to quit---
+   0x0000000000401cd0 <+138>:	lea    0x80386(%rip),%rdi        # 0x48205d
+   0x0000000000401cd7 <+145>:	callq  0x40d4f0 <puts>
+   0x0000000000401cdc <+150>:	jmp    0x401cea <main+164>
+   0x0000000000401cde <+152>:	lea    0x80385(%rip),%rdi        # 0x48206a
+   0x0000000000401ce5 <+159>:	callq  0x40d4f0 <puts>
+   0x0000000000401cea <+164>:	mov    $0x0,%eax
+   0x0000000000401cef <+169>:	leaveq 
+   0x0000000000401cf0 <+170>:	retq  
+
+First we have a lot of commands for initialization until we come to the main function.
+Mainis stored here:đ
+0x0000000000401c5c <+22>:	jmp    0x401c6c <main+38>
+
+First we have a for loop with 20 iterations. i is set to 0 at the beginning and then incrememnted to 20. It's our local variable inside main, as we can see with command:
+"info locals"
+buf = "password", '\000' <repeats 11 times>
+ok = 0
+i = 20
+
+After loop, we have buffer of value "\000" which repeats 19 times.
+
+Afte ra while, gets function is called (i think here: 0x0000000000401c8f <+73>:	callq  0x40d380 <gets>) and we need to input our password.
+The password variable now gets overridden and looks something like:
+buf = "my_password\000\000\000\000\000\000\000\000"
+ok = 0
+i = 20
+
+--
+
+jle: conditional jump that follows a test. It performs a signed comparison jump after a cmp if the destination operand is less than or equal to the source operand.

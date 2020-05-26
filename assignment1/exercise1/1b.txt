@@ -1,0 +1,8 @@
+used command: ls -l -h > 1b.txt
+I listed parent folder contents where I keep my "hic-..." folder. As we can see, it's 4,0KB (4000B) big.
+
+total 104K
+-rw-r--r-- 1 jakob jakob    0 apr 14 11:39 1b.txt
+-rw-rw-r-- 1 jakob jakob  95K apr 14 11:35 assignment1.pdf
+drwxr-xr-x 5 jakob jakob 4,0K apr 14 11:38 hic-S1049877-S1049877
+-rw-rw-r-- 1 jakob jakob 2,2K apr  9 14:51 message.txt

@@ -1,0 +1,15 @@
+1.a
+mkdir hic-s1049877-s1049877
+cd hic-s1049877-s1049877
+mkdir exercise1
+mkdir exercise2
+mkdir exercise3
+
+1.b
+vi names.txt 
+
+I didn't need to move this file, but I would do with "mv /current/path/to/file.txt /desired/path/to/file"
+
+1.c
+ls -l -h 
+-h flag is for "human" readable size of files/dirs

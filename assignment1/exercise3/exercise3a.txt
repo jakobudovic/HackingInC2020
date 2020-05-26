@@ -1,0 +1,11 @@
+
+/dev/random is blocking, whereas /dev/urandom is not.
+That means that if/when /dev/random runs out of entropy, it blocks.
+If we try to print out the urandom (cat command) we see it never stops, where as printing the random stops.
+
+In Linux 4.8 and onward, /dev/urandom does not deplete the entropy pool (used by /dev/random) but uses the CSPRNG output from upstream.
+
+The u in "urandom" means unlimited.
+
+Source: https://www.2uo.de/myths-about-urandom/
+and https://www.2uo.de/myths-about-urandom/

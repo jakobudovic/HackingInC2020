@@ -1,0 +1,9 @@
+b)
+"Because strcpy is specifically designed to copy strings"
+Thom @1:12:56: https://youtu.be/G2Ip2svWKUc?t=4376
+
+And because we think the point here was to store strings to heap with malloc and not on stack with char*.
+
+c) 
+for the null terminating character at the end of the string.
+\0

@@ -1,0 +1,23 @@
+b)
+Our program gets killed.
+We didn't free memory correctly after allocating matrices.
+
+c)
+We free the memory correctly:
+// free matrices m and mt
+    for(i=0;i<1000;i++){
+      free(m[i]);
+    }
+    free(m);
+    for(i=0;i<1000;i++){
+      free(mt[i]);
+    }
+    free(mt);
+
+Because it's a 2D matrix, in C, our original matrix is actually just an aray of pointers to our actual matrices.
+
+The first pointer m is actually a pointer to a pointer of a first array.
+
+exercise4.c now works.
+
+ 

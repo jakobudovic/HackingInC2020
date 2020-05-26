@@ -1,0 +1,20 @@
+a) 0x7ffb3cc3b20
+the pointer of the pointer is stored at the same address
+
+b) 0x7ffb3cc3b24
+the next address of the pointer, where our second variable is stored.
+It is 4 blocks higher because we have 4 Bytes big types (int32_t) stored in an array.
+
+c) 0x7ffb3cc3b30
+The next "free" address. It is 16 addresses higher because our array consists of 4 elements, each of size 4 Bytes. So 4 * 4 = 16. 
+
+d) 23
+The value stored on the first address of our  array, the pointer x points to.
+
+e) 28
+23 + 5. Just different approach of obtaining the values of the array.
+
+f) 151
+23 + 128
+First number is the same as at e), the second number is a "1" bit shifted all the way to the left (7 times), making it hold a value of 128.
+ 

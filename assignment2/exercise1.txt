@@ -1,0 +1,31 @@
+Exercise1.txt
+
+1.d)
+
+If we print the sizeof(f) we get the size of memoory allocated at the addres that pointer f points to.
+If we print sizeof(*f) we print the size of the first value there, which is shor type, hence 2Bytes.
+Same goes with printing the value f. If we just output the f, we get a weird number, so i printed out first value stored at that address (6) with a star in front of the pointer f -> *f.
+
+https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.bpxbd00/inttyph.htm
+
+
+
+0x7fff6755ffcf         c            3        1 0x7fff6755ffd0
+0x7fff6755ffd0         d            4        1 0x7fff6755ffd1
+0x7fff6755ffd1         i            9        1 0x7fff6755ffd2
+0x7fff6755ffd2         b            2        2 0x7fff6755ffd4
+0x7fff6755ffd4         a            1        4 0x7fff6755ffd8
+0x7fff6755ffd8         e            5        8 0x7fff6755ffe0
+0x7fff6755ffe0         g            7        8 0x7fff6755ffe8
+0x7fff6755ffe8         h            8        8 0x7fff6755fff0
+0x7fff6755fff2         f            6        6 0x7fff6755fff8
+
+	
+1.f) 
+I imagine it has to do something with data types. Smaller data types (short, ) have lower addresses than bigger/longer (long long)
+We also said that arrays get saved on heap, instead of stack, where we need to allocate (malloc) memory ourselves, as well as free it. I don't think this happened here, since we saved an array with the values and therefore allocated memory.
+
+1.g)
+There is no space in-between which is great because of the memory management. It stays in order.
+There is just 2B of space between h variable (unsigned long int) and array f. My guess is that an array is responsible for that. Maybe because if we try to reach -1th element of the array (happens in for loops) like f[-1], we get index out of bonds exception (at least in Java). If we didn't have that space, we would just access our unsigned long int variable. That would be my guess.
+

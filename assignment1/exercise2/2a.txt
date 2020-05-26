@@ -1,0 +1,17 @@
+
+2.a
+Google search: "linux number of word occurrences in a text file"
+Source: https://www.tecmint.com/count-word-occurrences-in-linux-text-file/
+Deleting newlines bash: https://unix.stackexchange.com/questions/254644/how-do-i-remove-newline-character-at-the-end-of-file
+Reading man of tr.
+Command used: cat genome.txt | tr -d '\n' | grep -o -i GATTACA | wc -l >> 2a.txt 
+
+Answer 2.a:
+4
+
+==================================================================================
+
+2.b
+
+Googling how to write first script: https://www.google.com/search?q=linux+write+first+script&oq=linux+write+first+script&aqs=chrome..69i57j33l7.3568j0j7&sourceid=chrome&ie=UTF-8
+

