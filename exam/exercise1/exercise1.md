@@ -58,7 +58,7 @@ By entering
 61546b5a5030377d
 ```
 
-
+Flag: 
 ```
 HiCCTF{W0EkouRlR4fYXopWfXiowOfs9OMhyh2gFpOnrMnIMBQNiKQUSS1ELpMISaTkZP07}
 ```

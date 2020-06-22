@@ -1,0 +1,4 @@
+getenvaddr
+getenvaddr-bytes
+reverseaddr
+*.o
