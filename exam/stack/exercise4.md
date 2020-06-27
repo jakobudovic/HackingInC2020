@@ -1,4 +1,4 @@
-# Exercise 4
+# Exercise 2
 ## Jakob Udovic, s1049877
 
 https://www.rapidtables.com/convert/number/hex-to-ascii.html  
