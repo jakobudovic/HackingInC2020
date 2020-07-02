@@ -1,0 +1,133 @@
+TAIL(1)          User Commands          TAIL(1)
+
+NNAAMMEE
+       tail - output the last part of files
+
+SSYYNNOOPPSSIISS
+       ttaaiill [_O_P_T_I_O_N]... [_F_I_L_E]...
+
+DDEESSCCRRIIPPTTIIOONN
+       Print  the last 10 lines of each FILE to
+       standard output.   With  more  than  one
+       FILE,  precede each with a header giving
+       the file name.
+
+       With no FILE, or when FILE  is  -,  read
+       standard input.
+
+       Mandatory  arguments to long options are
+       mandatory for short options too.
+
+       --cc, ----bbyytteess=_[+]NUM
+              output the last NUM bytes; or use
+              --cc  +NUM  to output starting with
+              byte NUM of each file
+
+       --ff, ----ffoollllooww[[=={name|descriptor}]
+              output appended data as the  file
+              grows;
+
+              an  absent  option argument means
+              'descriptor'
+
+       --FF     same as ----ffoollllooww=_n_a_m_e ----rreettrryy
+
+       --nn, ----lliinneess=_[+]NUM
+              output  the   last   NUM   lines,
+              instead of the last 10; or use --nn
+              +NUM to output starting with line
+              NUM
+
+       ----mmaaxx--uunncchhaannggeedd--ssttaattss=_N
+              with ----ffoollllooww=_n_a_m_e, reopen a FILE
+              which has not
+
+              changed size after N (default  5)
+              iterations  to see if it has been
+              unlinked or renamed (this is  the
+              usual case of rotated log files);
+              with  inotify,  this  option   is
+              rarely useful
+
+       ----ppiidd=_P_I_D
+              with  --ff, terminate after process
+              ID, PID dies
+
+       --qq, ----qquuiieett, ----ssiilleenntt
+              never output headers giving  file
+              names
+
+       ----rreettrryy
+              keep  trying to open a file if it
+              is inaccessible
+
+       --ss, ----sslleeeepp--iinntteerrvvaall=_N
+              with --ff, sleep for  approximately
+              N  seconds  (default 1.0) between
+              iterations;  with   inotify   and
+              ----ppiidd=_P, check process P at least
+              once every N seconds
+
+       --vv, ----vveerrbboossee
+              always output headers giving file
+              names
+
+       --zz, ----zzeerroo--tteerrmmiinnaatteedd
+              line  delimiter  is NUL, not new‐
+              line
+
+       ----hheellpp display this help and exit
+
+       ----vveerrssiioonn
+              output  version  information  and
+              exit
+
+       NUM may have a multiplier suffix: b 512,
+       kB  1000,  K  1024,  MB   1000*1000,   M
+       1024*1024,    GB    1000*1000*1000,    G
+       1024*1024*1024, and so on for T,  P,  E,
+       Z, Y.
+
+       With  ----ffoollllooww  (--ff),  tail  defaults to
+       following  the  file  descriptor,  which
+       means  that  even  if  a tail'ed file is
+       renamed, tail will continue to track its
+       end.    This  default  behavior  is  not
+       desirable when you really want to  track
+       the  actual  name  of  the file, not the
+       file descriptor  (e.g.,  log  rotation).
+       Use  ----ffoollllooww=_n_a_m_e  in  that case.  That
+       causes tail to track the named file in a
+       way  that accommodates renaming, removal
+       and creation.
+
+AAUUTTHHOORR
+       Written by Paul Rubin, David  MacKenzie,
+       Ian Lance Taylor, and Jim Meyering.
+
+RREEPPOORRTTIINNGG BBUUGGSS
+       GNU      coreutils      online     help:
+       <http://www.gnu.org/software/coreutils/>
+       Report   tail   translation   bugs    to
+       <http://translationproject.org/team/>
+
+CCOOPPYYRRIIGGHHTT
+       Copyright  ©  2017 Free Software Founda‐
+       tion, Inc.  License GPLv3+: GNU GPL ver‐
+       sion          3         or         later
+       <http://gnu.org/licenses/gpl.html>.
+       This is free software: you are  free  to
+       change and redistribute it.  There is NO
+       WARRANTY, to  the  extent  permitted  by
+       law.
+
+SSEEEE AALLSSOO
+       head(1)
+
+       Full          documentation          at:
+       <http://www.gnu.org/software/core‐
+       utils/tail>
+       or  available  locally via: info '(core‐
+       utils) tail invocation'
+
+GNU coreutils 8.28January 2018          TAIL(1)

