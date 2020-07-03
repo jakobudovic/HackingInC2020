@@ -299,4 +299,3 @@ Flag:
 cat /FLAG
 HiCCTF{PyiTvuGWCHNbZTz0AwzCPWVAZotbsbW6lOKahkgCykGLRRyzyweJ0PEns7YJvBwH}
 ```
-
